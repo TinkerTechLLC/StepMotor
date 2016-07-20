@@ -16,7 +16,6 @@ class StepMotor{
     public:
 
     // Constructors
-    StepMotor();
     StepMotor(int p_mot_steps, int p_step_pin, int p_dir_pin, int p_ms_pin1, int p_ms_pin2, int p_ms_pin3);
 
     // Public functions
@@ -75,7 +74,13 @@ class StepMotor{
     static const int g_SEC_PER_MIN = 60;
     static const long g_MICROS_PER_SEC = 1e6;
 
-    // Wonky step functions, function pointers, and bitmasks
+    /*
+        Timer1 and FrequencyTimer2 interrupt libraries require regular
+        function pointers, not non-static member function pointers, so
+        the step functions have to be declared static to make things work.
+        This is kind of janky, but I don't think there's another way it can
+        be done without modifying the interrupt libaries themselves.
+    */
     static void (*g_ptr_toggleStepPin0)(unsigned char p_on);
     static void (*g_ptr_toggleStepPin1)(unsigned char p_on);
     static void togglePORTD(unsigned char p_on);

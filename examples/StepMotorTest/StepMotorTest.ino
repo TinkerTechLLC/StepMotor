@@ -1,3 +1,5 @@
+#include <TimerOne.h>
+#include <FrequencyTimer2.h>
 #include <StepMotor.h>
 
 // Stepper motor test
@@ -5,7 +7,7 @@ StepMotor motor[2];
 
 void setup(){
     motor[0] = StepMotor(400, 6, 5, 8, 5, 4);
-    motor[1] = StepMotor(400, 11, 12, 9, 10, 13)};
+    motor[1] = StepMotor(400, 11, 12, 9, 10, 13);
 } 
 
 void loop(){
