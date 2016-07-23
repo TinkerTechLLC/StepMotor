@@ -16,6 +16,7 @@ class StepMotor{
     public:
 
     // Constructors
+    StepMotor();
     StepMotor(int p_mot_steps, int p_step_pin, int p_dir_pin, int p_ms_pin1, int p_ms_pin2, int p_ms_pin3);
 
     // Public functions
@@ -50,7 +51,7 @@ class StepMotor{
     
     //Basic properties
     int m_ms;
-    float m_steps_per_sec;
+    static float *g_steps_per_sec;
     float m_target_steps_per_sec;
     int m_accel;
     bool m_dir;
@@ -65,7 +66,7 @@ class StepMotor{
     int m_ms_pin3;
 
     // Derived properties
-    long m_step_delay;
+    static long *g_step_delay;
     bool m_update_required;
     bool m_selected;
     
@@ -73,6 +74,8 @@ class StepMotor{
     // Consts
     static const int g_SEC_PER_MIN = 60;
     static const long g_MICROS_PER_SEC = 1e6;
+    static const int g_MAX_MOTORS = 2;
+    static const int g_MAX_STEPS_PER_SEC = 4000;
 
     /*
         Timer1 and FrequencyTimer2 interrupt libraries require regular
@@ -81,16 +84,18 @@ class StepMotor{
         This is kind of janky, but I don't think there's another way it can
         be done without modifying the interrupt libaries themselves.
     */
-    static void (*g_ptr_toggleStepPin0)(unsigned char p_on);
-    static void (*g_ptr_toggleStepPin1)(unsigned char p_on);
-    static void togglePORTD(unsigned char p_on);
-    static void togglePORTB(unsigned char p_on);
+    static void (*g_ptr_toggleStepPin0)(uint8_t p_on);
+    static void (*g_ptr_toggleStepPin1)(uint8_t p_on);
+    static void togglePORTD(uint8_t p_on);
+    static void togglePORTB(uint8_t p_on);
     static void step0();
     static void step1();
-    static unsigned char g_on0;     // Step bitmask for motor 0
-    static unsigned char g_on1;     // Step bitmask for motor 1
+    static void checkStep();
+    static long *g_last_step_time;
+    static uint8_t *g_on;     
 
     // Private functions
     void dir(bool p_fwd);
     void updateStepDelay();
+    void printID();
 };
