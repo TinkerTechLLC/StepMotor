@@ -17,7 +17,9 @@ class StepMotor{
 
     // Constructors
     StepMotor();
-    StepMotor(int p_mot_steps, int p_step_pin, int p_dir_pin, int p_ms_pin1, int p_ms_pin2, int p_ms_pin3);
+    StepMotor(int p_mot_steps);
+
+    void initialize();
 
     // Public functions
     void ms(int p_ms);
@@ -53,6 +55,7 @@ class StepMotor{
     int m_ms;
     static float *g_steps_per_sec;
     float m_target_steps_per_sec;
+    float m_rpm;
     int m_accel;
     bool m_dir;
     bool m_flip;
@@ -70,30 +73,22 @@ class StepMotor{
     bool m_update_required;
     bool m_selected;
     
-    static bool *g_using_timer_1;
 
     // Consts
     static const int g_SEC_PER_MIN = 60;
     static const long g_MICROS_PER_SEC = 1e6;
     static const int g_MAX_MOTORS = 2;
     static const int g_MAX_STEPS_PER_SEC = 4000;
+    static const int g_STEP[2];
+    static const int g_DIR[2];
+    static const int g_MS1[2];
+    static const int g_MS2[2];
+    static const int g_MS3[2];
+    static const uint8_t g_ON[2];   
 
-    /*
-        Timer1 and FrequencyTimer2 interrupt libraries require regular
-        function pointers, not non-static member function pointers, so
-        the step functions have to be declared static to make things work.
-        This is kind of janky, but I don't think there's another way it can
-        be done without modifying the interrupt libaries themselves.
-    */
-    static void (*g_ptr_toggleStepPin0)(uint8_t p_on);
-    static void (*g_ptr_toggleStepPin1)(uint8_t p_on);
-    static void togglePORTD(uint8_t p_on);
-    static void togglePORTB(uint8_t p_on);
+    // Step functions
     static void step0();
     static void step1();
-    static void checkStep();
-    static long *g_last_step_time;
-    static uint8_t *g_on;     
 
     // Private functions
     void dir(bool p_fwd);
