@@ -70,6 +70,7 @@ class StepMotor{
     bool m_update_required;
     bool m_selected;
     
+    static bool *g_using_timer_1;
 
     // Consts
     static const int g_SEC_PER_MIN = 60;

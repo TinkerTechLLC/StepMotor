@@ -7,6 +7,7 @@ float *StepMotor::g_steps_per_sec = (float *)malloc(g_MAX_MOTORS * sizeof(float)
 long *StepMotor::g_step_delay = (long *)malloc(g_MAX_MOTORS * sizeof(long));
 long *StepMotor::g_last_step_time = (long *)malloc(g_MAX_MOTORS * sizeof(long));
 uint8_t *StepMotor::g_on = (uint8_t *)malloc(g_MAX_MOTORS * sizeof(uint8_t));
+bool *StepMotor::g_using_timer_1 = (bool *)malloc(g_MAX_MOTORS * sizeof(bool));
 
 StepMotor::StepMotor(){}
 
@@ -27,10 +28,16 @@ StepMotor::StepMotor(int p_mot_steps, int p_step_pin, int p_dir_pin, int p_ms_pi
 
     if(m_id == 0){
         Timer1.initialize();
-        //Timer1.attachInterrupt(checkStep, 30);//, 1e6 / g_MAX_STEPS_PER_SEC);
+        g_using_timer_1[m_id] = true;
+    }
+    else{
+        FrequencyTimer2::disable();
+        FrequencyTimer2::setOnOverflow(0);
+        g_using_timer_1[m_id] = false;
     }
     // Default to zero speed and full stepping
     g_steps_per_sec[m_id] = 0;
+    g_step_delay[m_id] = 0;
     g_last_step_time[m_id] = micros();
     this->ms(16);
 }
@@ -134,14 +141,14 @@ void StepMotor::rpm(float p_rpm){
     if(p_rpm <= 20){
         ms(16);
     }
-    else if(p_rpm > 20 && p_rpm <= 100){
+    else if(p_rpm > 20 && p_rpm <= 75){
         ms(8);
     }
-    else if(p_rpm > 100 && p_rpm <= 150){
+    else if(p_rpm > 75 && p_rpm <= 125){
         ms(4);
     }
 
-    else if(p_rpm > 150 && p_rpm <= 200){
+    else if(p_rpm > 125 && p_rpm <= 200){
         ms(2);
     }
 
@@ -149,8 +156,6 @@ void StepMotor::rpm(float p_rpm){
         ms(1);
     }
     float steps_per_sec = (float)p_rpm * (float)m_mot_steps * (float)m_ms / (float)g_SEC_PER_MIN;
-    Serial.print(" steps per sec: ");
-    Serial.println(steps_per_sec);
     stepsPerSec(steps_per_sec);
 }
 float StepMotor::rpm(){
@@ -170,10 +175,61 @@ long StepMotor::stepDelay(){
     return g_step_delay[m_id];
 }
 void StepMotor::updateStepDelay(){
+    // Don't do anything if neither motor has been initialized
     if(g_id == 0)
         return;
+    
+    // Stop interrupt if steps per sec is 0. Can't divide by 0 later.
+    if(g_steps_per_sec[m_id] == 0){
+        if(g_using_timer_1[0])
+            Timer1.detachInterrupt();
+        else{
+            FrequencyTimer2::setOnOverflow(NULL);
+            FrequencyTimer2::disable();
+        }
+        return;
+    }
+
+    // Determine delay and set new ISR interval
     g_step_delay[m_id] = round((float)g_MICROS_PER_SEC / g_steps_per_sec[m_id]);
-    Timer1.attachInterrupt(step1, g_step_delay[m_id]);//, 1e6 / g_MAX_STEPS_PER_SEC);
+
+    // If the other motor is using timer 1, swap it to timer 2
+    if(!g_using_timer_1[m_id]){
+        if(m_id == 0){
+            g_using_timer_1[0] = true;
+            g_using_timer_1[1] = false;
+            if(g_steps_per_sec[0] == 0){
+                FrequencyTimer2::setOnOverflow(0);
+                FrequencyTimer2::disable();
+            }
+            else{
+                FrequencyTimer2::setOnOverflow(step1);
+                FrequencyTimer2::setPeriod(g_step_delay[1]);
+                FrequencyTimer2::enable();
+            }
+        }
+        else{
+            g_using_timer_1[1] = true;
+            g_using_timer_1[0] = false;
+            if(g_steps_per_sec[0] == 0){
+                FrequencyTimer2::setOnOverflow(0);
+                FrequencyTimer2::disable();
+            }
+            else{
+                FrequencyTimer2::setOnOverflow(step0);
+                FrequencyTimer2::setPeriod(g_step_delay[0]);
+                FrequencyTimer2::enable();
+            }
+        }
+    }
+
+    // Change the speed of the current motor using timer 1
+    if(m_id == 0){
+        Timer1.attachInterrupt(step0, g_step_delay[m_id]);//, 1e6 / g_MAX_STEPS_PER_SEC);
+    }
+    else{
+        Timer1.attachInterrupt(step1, g_step_delay[m_id]);//, 1e6 / g_MAX_STEPS_PER_SEC);
+    }
     printID();
     Serial.print(" step delay: ");
     Serial.println(g_step_delay[m_id]);
