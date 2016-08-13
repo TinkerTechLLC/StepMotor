@@ -3,14 +3,14 @@ A library for running up to two stepper motors from an Arduino Uno or compatible
 A4988 motor drivers (available [here](https://www.pololu.com/product/1182) as breakout boards).
 
 ## Overview
-- This library uses [Timer1](http://playground.arduino.cc/Code/Timer1) and [FrequencyTimer2](http://playground.arduino.cc/Code/FrequencyTimer2) 
-libraries to trigger the step ISRs, so you cannot use timer1 or timer2 for anything else in your sketch and their associated
-PWM outputs are disabled (will vary depending on the board).
-- This library is written for the Atmega328 chip (Arduino Uno, Arduino Duemilanove, for example). If you use it with other boards,
-you will probably have to change the port registers used in the ISRs and assignment of the bit masks used to toggle those 
-registers to match your hardware.
+- This library is currently for continuous motion applications only. There are no fixed distance move functions yet, but they will be added in the next version.
+- This library uses the [Timer1](http://playground.arduino.cc/Code/Timer1)library to trigger the step ISRs, so you cannot use timer1 for anything else in your sketch and their associated PWM outputs are disabled (will vary depending on the board).
+- This library is written for the Atmega328 chip (Arduino Uno, Arduino Duemilanove, for example). If you use it with other boards, you will probably have to change the port registers used in the ISRs and assignment of the bit masks used to toggle those registers to match your hardware.
 - Only two StepMotor objects can be created, since there are only two interrupt timers to which their ISRs can be attached.
 Don't try to create more than two. You will be unhappy.
+
+## Caveats
+Be careful if using this library with any other code that depends upon interrupts. My initial use of this library was inconjunction with the [Adafruit RGB LCD shield](https://www.adafruit.com/product/714), but that library depends upon the Wire library (I2C), which is interrupt driven. Eventually I was able to find a stable situation in which I could properly update the motor speeds on the LCD, but if I tried to write too many characters or write them at the wrong time, it would make one or both motors cease functioning.
 
 ## Documentation
 
