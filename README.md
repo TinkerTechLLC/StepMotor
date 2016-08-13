@@ -14,20 +14,10 @@ Be careful if using this library with any other code that depends upon interrupt
 
 ## Documentation
 
-**StepMotor(int p_mot_steps, int p_step_pin, int p_dir_pin, int p_ms_pin1, int p_ms_pin2, int p_ms_pin3)**
+**StepMotor(int p_mot_steps)**
 
 *int p_mot_steps:* The number of physical steps on your motor. Most motors will have 200 (1.8 degree step size), some
 will have 400 (0.9 degree) step size.
-
-*int p_step_pin:* The pin connected to the motor driver's step input pin.
-
-*int p_dir_pin:* The pin connected to the motor driver's direction input pin.
-
-*int p_ms_pin1:* The pin connected to the motor driver's ms1 input pin.
-
-*int p_ms_pin2:* The pin connected to the motor driver's ms2 input pin.
-
-*int p_ms_pin2:* The pin connected to the motor driver's ms3 input pin.
 
 **void ms(int p_ms)**
 
@@ -39,15 +29,15 @@ Returns the current microstep value.
 
 **void rpm(float p_rpm)**
 
+This is the function used for setting the motor's continuous speed. Direction is set by using positive or negative value.
+The step rate in steps per second can be checked with the stepsPerSec() function, but cannot be set directly, since the
+motor's microstep setting is set automatically based on the RPM.
+
 *float p_rpm:* The new speed of the motor in RPM.
 
 **float rpm()**
 
 Returns the current motor speed in RPM.
-
-**void stepsPerSec(float p_spd)**
-
-*float p_spd:* The new speed of the motor in steps per second.
 
 **float stepsPerSec()**
 
@@ -60,15 +50,6 @@ Returns the current motor speed in steps per second.
 **bool flip()**
 
 Returns whether the motor's direction flags are being flipped.
-
-**void select(bool p_selected)**
-
-*bool p_selected:* Sets a "selected" flag for the motor object. This is not used within the object and is merely an indicator
-that can be used by external code that may want to indicated an active motor.
-
-**bool isSelected()**
-
-Returns whether the motor's "selected" flag is true.
 
 **bool updateRequired()**
 
