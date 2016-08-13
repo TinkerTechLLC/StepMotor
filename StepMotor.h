@@ -8,8 +8,9 @@
 	#include "WProgram.h"
 #endif
 
+// TimerOne must also be included in whatever
+// code uses this firmware
 #include <TimerOne.h>
-#include <FrequencyTimer2.h>
 
 class StepMotor{
     
@@ -28,7 +29,6 @@ class StepMotor{
     void rpm(float p_rpm);
     float rpm();
 
-    void stepsPerSec(float p_spd);
     float stepsPerSec();
 
     void flip(bool p_enabled);
@@ -37,10 +37,7 @@ class StepMotor{
     void select(bool p_selected);
     bool isSelected();
 
-    void stepPin(int p_pin);
     int stepPin();
-
-    void dirPin(int p_pin);
     int dirPin();
 
     bool updateRequired();
@@ -54,7 +51,6 @@ class StepMotor{
     //Basic properties
     int m_ms;
     static float *g_steps_per_sec;
-    float m_target_steps_per_sec;
     float m_rpm;
     int m_accel;
     bool m_dir;
@@ -68,12 +64,6 @@ class StepMotor{
     int m_ms_pin2;
     int m_ms_pin3;
 
-    // Derived properties
-    static long *g_step_delay;
-    bool m_update_required;
-    bool m_selected;
-    
-
     // Consts
     static const int g_SEC_PER_MIN = 60;
     static const long g_MICROS_PER_SEC = 1e6;
@@ -86,9 +76,32 @@ class StepMotor{
     static const int g_MS3[2];
     static const uint8_t g_ON[2];   
 
+    // ISR interval in microseconds
+    // Motors run best with an interval around 50us
+    static const int g_ISR_INTERVAL = 50;
+
+    static const int g_FLOAT_CONVERT = 1000;
+    static volatile long *g_cycle_err;    
+    static volatile long *g_total_err;
+    static volatile long *g_off_cycles;
+    static volatile long *g_cur_off_cycles;
+    static volatile bool *g_running;
+
+
     // Step functions
-    static void step0();
-    static void step1();
+    void stepsPerSec(float p_spd);
+    static bool checkStep(int p_which);
+    static void _ISR();
+
+    // Pin setup functions
+    /*
+     * These have to be private becuase the ISR
+     * is currently setup to toggle fixed pins on 
+     * the port registers, so code outside the library
+     * shouldn't touch these values
+     */
+    void stepPin(int p_pin);
+    void dirPin(int p_pin);
 
     // Private functions
     void dir(bool p_fwd);
