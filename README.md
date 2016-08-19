@@ -1,4 +1,4 @@
-# StepMotor
+# TT_StepperMotorShield_Library
 A library for running up to two stepper motors driven by a TinkerTech stepper motor shield (https://github.com/TinkerTechLLC/TT_StepperMotorShield) with an Arduino Uno. Other Arduino compatible boards may work, but the library will require modification since it directly manipulates the ATmega328P I/O ports and this mapping will be different with different boards / chips.
 
 ## Overview
