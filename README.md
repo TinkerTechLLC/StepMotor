@@ -1,6 +1,5 @@
 # StepMotor
-A library for running up to two stepper motors from an Arduino Uno or compatible board connected to 
-A4988 motor drivers (available [here](https://www.pololu.com/product/1182) as breakout boards).
+A library for running up to two stepper motors driven by a TinkerTech stepper motor shield (https://github.com/TinkerTechLLC/TT_StepperMotorShield) with an Arduino Uno. Other Arduino compatible boards may work, but the library will require modification since it directly manipulates the ATmega328P I/O ports and this mapping will be different with different boards / chips.
 
 ## Overview
 - This library is currently for continuous motion applications only. There are no fixed distance move functions yet, but they will be added in the next version.
