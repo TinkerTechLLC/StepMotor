@@ -3,7 +3,7 @@ A library for running up to two stepper motors driven by a TinkerTech stepper mo
 
 ## Overview
 - This library is currently for continuous motion applications only. There are no fixed distance move functions yet, but they will be added in the next version.
-- This library uses the [Timer1](http://playground.arduino.cc/Code/Timer1)library to trigger the step ISRs, so you cannot use timer1 for anything else in your sketch and their associated PWM outputs are disabled (will vary depending on the board).
+- This library uses the [Timer1](http://playground.arduino.cc/Code/Timer1) library to trigger the step ISRs, so you cannot use timer1 for anything else in your sketch and their associated PWM outputs are disabled (will vary depending on the board).
 - This library is written for the Atmega328 chip (Arduino Uno, Arduino Duemilanove, for example). If you use it with other boards, you will probably have to change the port registers used in the ISRs and assignment of the bit masks used to toggle those registers to match your hardware.
 - Only two StepMotor objects can be created, since there are only two interrupt timers to which their ISRs can be attached.
 Don't try to create more than two. You will be unhappy.
