@@ -9,7 +9,7 @@ A library for running up to two stepper motors driven by a TinkerTech stepper mo
 Don't try to create more than two. You will be unhappy.
 
 ## Caveats
-Be careful if using this library with any other code that depends upon interrupts. My initial use of this library was inconjunction with the [Adafruit RGB LCD shield](https://www.adafruit.com/product/714), but that library depends upon the Wire library (I2C), which is interrupt driven. Eventually I was able to find a stable situation in which I could properly update the motor speeds on the LCD, but if I tried to write too many characters or write them at the wrong time, it would make one or both motors cease functioning.
+Be careful if using this library with any other code that depends upon interrupts. My initial use of this library was in conjunction with the [Adafruit RGB LCD shield](https://www.adafruit.com/product/714), but that library depends upon the Wire library (I2C), which is interrupt driven. Eventually I was able to find a stable situation in which I could properly update the motor speeds on the LCD, but if I tried to write too many characters or write them at the wrong time, it would make one or both motors cease functioning.
 
 ## Documentation
 
